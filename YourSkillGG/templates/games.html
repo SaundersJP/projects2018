@@ -1,0 +1,117 @@
+{% for games_row in keys|batch(3, '&nbsp;') %}
+	
+
+	{% for game in games_row %}	
+		{% if game != '&nbsp;' %}
+			{% set currentPlayer = games[game]['primaryPlayerId'] %}
+			{% set imagePath = games[game]['champPortraits'][currentPlayer-1] %}
+			{% set matchClass = "matchLoss" %}
+			{% if games[game][currentPlayer]['stats']['stats']['win'] %}
+				{% set matchClass = "matchWin" %}
+			{% endif %}
+			<div class="{{ matchClass }}">
+				<div class="ignorePadding">
+					<div class="portraitBox">
+						<img src="{{ imagePath }}" class="championPhoto"/>
+					</div>
+
+					<div class="runes">
+						<div class="imageFlex">
+							<img src="{{games[game]['primaryPlayerRunes'][0]}}" class="keystone" />
+							<img src="{{games[game]['primaryPlayerRunes'][1]}}" class="secondaryRune"/>
+						</div>
+					</div>
+
+					<div class="ssBox">
+						<div class="imageFlex">
+							<img src="{{ games[game]['primaryPlayerSs'][0] }}" class="itemPhoto"/>
+							<img src="{{ games[game]['primaryPlayerSs'][1] }}" class="itemPhoto"/>
+						</div>
+					</div>
+
+					
+					
+					<div class="itemBox">
+						<div class="imageFlex">
+							{% for item in games[game]['primaryPlayerItems'] %}
+								{% if item %}
+									<img src="{{ item }}"" class="itemPhoto"/>
+								{% else %}
+									<div class="noItem"></div>
+								{% endif %}
+							{% endfor %}
+							
+							<img src="static/assets/item/2055.png" class="itemPhoto" text="1" style="border-radius: 50%; opacity: .5;"/>
+
+						</div>
+					</div>
+
+					<div class="scoreBox">
+						{% set kills= games[game][currentPlayer]['stats']['stats']['kills'] %}
+						{% set deaths= games[game][currentPlayer]['stats']['stats']['deaths'] %}
+						{% set assists= games[game][currentPlayer]['stats']['stats']['assists'] %}
+						{% set farm= games[game][currentPlayer]['stats']['stats']['totalMinionsKilled']+games[game][currentPlayer]['stats']['stats']['neutralMinionsKilled'] %}
+						{% set time= games[game]['gameDuration'] %}
+						{% if deaths==0 %}
+							{% set kda= "PERFECT" %}
+						{% else %}
+							{% set kda = (kills+assists)/deaths %}
+						{% endif %}
+
+						<div class="score" style="justify-content: flex-start;">
+							{{kills}}/<span class="red">{{deaths}}</span>/{{assists}}	
+						</div>
+						<div class="score" style="justify-content: flex-end;">
+							
+							{% if kda == "PERFECT" %}
+								<span style="color:goldenrod">{{ kda }}</span>
+							{% else %}
+								KDA:
+								{{ "%0.02f" %kda }}
+							{% endif %}
+						</div>
+						<div class="score" style="justify-content: flex-start">
+							{{ "%02d" %time[0] }}:{{ "%02d" %time[1] }}
+						</div>
+						<div class="score" style="justify-content: flex-end">
+							CS: {{farm}}<span class="min">({{ "%.01f" %(farm/(time[2]/60)) }})</span>
+						</div>
+					</div>
+
+					<div class="teamBox">
+						<div class="blueTeamBox">
+							{% for playerId in range((games[game]['playerNames']|length)//2) %}
+
+								<div class="PlayerBox">
+									<img src="{{ games[game]['champPortraits'][playerId] }}" class="summPicture"/>
+
+									<span class="textWrapper">
+										 {{ games[game]['playerNames'][playerId] }}
+									</span>
+								</div>
+
+							{% endfor %}
+						</div>
+						
+						<div class="redTeamBox">
+							{% for playerId in range((games[game]['playerNames']|length)//2, games[game]['playerNames']|length) %}
+
+								<div class="PlayerBox">
+									<img src="{{ games[game]['champPortraits'][playerId] }}" class="summPicture"/>
+									<span class="textWrapper">
+										 {{ games[game]['playerNames'][playerId] }}
+									</span>
+								</div>
+
+							{% endfor %}
+						</div>
+					</div>
+				</div>
+			</div>
+
+
+			
+		{% endif %}
+	{% endfor%}
+	
+{% endfor %}

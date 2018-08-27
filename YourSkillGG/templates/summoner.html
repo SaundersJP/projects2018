@@ -1,0 +1,65 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+	
+	<div class="myOverlay" id="loading"></div>
+	<div class="allMatches" id="allMatches"></div>
+	<div id="btnDiv" style="display: none; width: 100%; text-align: center; padding-bottom: 10px;">
+		<button id="btn" class="btn btn-primary text-white">More Matches</button>
+	</div>
+	
+
+	<script>
+		var $loading = $('div#loading').hide();
+		//Attach the event handler to any element
+		$(document)
+ 			.ajaxStart(function () {
+			//ajax request went so show the loading image
+     			$loading.show();
+			})
+ 			.ajaxStop(function () {
+			//got response so hide the loading image
+				$loading.hide();
+			});
+	</script>
+
+	<script type="text/javascript">
+		var myButton = $('div#btnDiv')
+		$(document).ready(function(){
+			$.ajax({
+				url: "/_get_matches",
+				type: "POST",
+				data: {summonerName: "{{session['summonerName']}}", beginIndex: 0},
+				success: function(resp){
+					$('div#allMatches').append(resp.data);
+					myButton.show()
+				},
+				error: function(XMLHttpRequest, textStatus, errorThrown){
+					console.log("Status: " + textStatus); 
+            		console.log("Error: " + errorThrown);
+				}
+			});
+		});
+	</script>
+	
+	<script type="text/javascript">
+		var matchIndex = 12;
+		$('button#btn').click(function(){
+			$.ajax({
+				url: "/_get_matches",
+				type: "POST",
+				data: {summonerName: "Keyboard WarrÌor", beginIndex: matchIndex},
+				success: function(resp){
+					matchIndex += resp.count
+					console.log(matchIndex)
+					$('div#allMatches').append(resp.data);
+				},
+				error: function(XMLHttpRequest, textStatus, errorThrown){
+					console.log("Status: " + textStatus); 
+            		console.log("Error: " + errorThrown);
+				}
+			});
+		});
+	</script>
+
+{% endblock %}
